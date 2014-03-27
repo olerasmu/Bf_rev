@@ -25,19 +25,28 @@ class Bf_reverse(object):
     #Slit the file into blocks of 128 bit (16*8 bytes)    
     def blockifyFile(self):
         with open(self.filepath, 'r') as newfile:
-            bytes = newfile.read(16)
+            bytes = str(newfile.read(16))
             while bytes:
                 self.butterflyTab.append(bytes)
                 print bytes, " byte"
-                bytes = newfile.read(16)
+                bytes = str(newfile.read(16))
             #print ("File has been divided into blocks")
             
+    def blockifyFileTwo(self):
+        with open(self.filepath, 'r') as newfile:
+            for i in range(0, self.fileSize()/16):
+                byte = newfile.read(16)
+                print byte, " byte"
+                self.butterflyTab.append(byte)
             
     def fileifyBlocks(self):
+        #self.fileTab.pop()
         with open('rev_hourglass.txt', 'a') as rev_hourglass_file:
+            #count = 0
             for byte in self.fileTab:
-                rev_hourglass_file.write(byte)    
-    
+                rev_hourglass_file.write(byte)
+                #count += 1    
+                #print "This is the nr 1 count: ", count
     
     #Initialize the butterfly function. Variable j is controlled from here
     def initiateButterfly(self, d, n):
@@ -81,13 +90,14 @@ class Bf_reverse(object):
     count = 0
     def w(self, blockOne, blockTwo, indexOne, indexTwo):
         self.count += 1
-        self.fileTab[indexOne] = blockTwo
-        self.fileTab[indexTwo] = blockOne
+        self.fileTab[indexOne] = blockOne
+        self.fileTab[indexTwo] = blockTwo
         #print self.count
         
 bf_rev = Bf_reverse(filepath = 'C:\\Users\\olerasmu\\Documents\\workspace\\Butterfly\\src\\root\\nested\\bf_hourglass.txt')
 print bf_rev.fileSize()
-bf_rev.blockifyFile()
+#bf_rev.blockifyFile()
+bf_rev.blockifyFileTwo()
 print "Butterflytab: ", bf_rev.butterflyTab
 print "filetab: ", bf_rev.fileTab
 n = len(bf_rev.butterflyTab)
@@ -98,6 +108,5 @@ bf_rev.initiateButterfly(d, n)
 print bf_rev.filepath
 print "This is filetab after: ", bf_rev.fileTab
 print len(bf_rev.fileTab)
-print ""
 bf_rev.fileifyBlocks()
 

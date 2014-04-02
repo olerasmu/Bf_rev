@@ -4,6 +4,8 @@ Created on 25. mars 2014
 @author: olerasmu
 '''
 import math
+import os
+from Crypto.Cipher import AES 
 class Bf_reverse(object):
     
     def __init__(self, filepath = None):
@@ -24,20 +26,39 @@ class Bf_reverse(object):
     
     #Slit the file into blocks of 128 bit (16*8 bytes)    
     def blockifyFile(self):
-        with open(self.filepath, 'r') as newfile:
+        print "This is blckifyfile"
+        with open(self.filepath, 'rb') as newfile:
+            count = 0
             bytes = str(newfile.read(16))
             while bytes:
                 self.butterflyTab.append(bytes)
-                print bytes, " byte"
+                print bytes, " bytenr: ", count
+                count += 1 
                 bytes = str(newfile.read(16))
             #print ("File has been divided into blocks")
             
     def blockifyFileTwo(self):
-        with open(self.filepath, 'r') as newfile:
+        print "This is blckifyfile 2"
+        with open(self.filepath, 'rb') as newfile:
             for i in range(0, self.fileSize()/16):
                 byte = newfile.read(16)
-                print byte, " byte"
+                print byte, " bytenr: ", i
                 self.butterflyTab.append(byte)
+    
+    
+    def fileifyBlocks2(self):
+        with open('rev_hourglass2.txt', 'ab') as rev_hourglass_file:
+            for byte in self.fileTab:
+                rev_hourglass_file.write(byte)
+        
+    #Save blocks from fileTab to a string
+    def stringifyBlocks(self):
+        plain_text_string = ""
+        
+        for byte in self.fileTab:
+            plain_text_string = plain_text_string + byte
+            
+        return plain_text_string
             
     def fileifyBlocks(self):
         #self.fileTab.pop()
@@ -87,17 +108,34 @@ class Bf_reverse(object):
         #print ("count: ", self.count)
         #print (self.butterflyTab)      
     
-    count = 0
     def w(self, blockOne, blockTwo, indexOne, indexTwo):
-        self.count += 1
-        self.fileTab[indexOne] = blockOne
-        self.fileTab[indexTwo] = blockTwo
+        cipher_machine = AES.new(b'This is a key123', AES.MODE_ECB)
+        #print blockOne, " ", blockTwo, " this is seperated"
+        
+        blockOne2 = cipher_machine.decrypt(blockOne)
+        blockTwo2 = cipher_machine.decrypt(blockTwo)
+        
+        combostring = blockTwo2 + blockOne2
+        
+        new_block_one, new_block_two = combostring[0::2], combostring[1::2]
+        
+        
+        print len(combostring)
+        print combostring, "this is combostring"
+        print new_block_one, " ",  new_block_two, " this is after"
+        
+        
+        self.fileTab[indexOne] = new_block_one
+        self.fileTab[indexTwo] = new_block_two
         #print self.count
+        
         
 bf_rev = Bf_reverse(filepath = 'C:\\Users\\olerasmu\\Documents\\workspace\\Butterfly\\src\\root\\nested\\bf_hourglass.txt')
 print bf_rev.fileSize()
-#bf_rev.blockifyFile()
-bf_rev.blockifyFileTwo()
+print os.path.getsize(bf_rev.filepath)
+bf_rev.blockifyFile()
+#bf_rev.blockifyFileTwo()
+#bf_rev.fileifyBlocks2()
 print "Butterflytab: ", bf_rev.butterflyTab
 print "filetab: ", bf_rev.fileTab
 n = len(bf_rev.butterflyTab)
@@ -108,5 +146,5 @@ bf_rev.initiateButterfly(d, n)
 print bf_rev.filepath
 print "This is filetab after: ", bf_rev.fileTab
 print len(bf_rev.fileTab)
-bf_rev.fileifyBlocks()
+bf_rev.fileifyBlocks2()
 

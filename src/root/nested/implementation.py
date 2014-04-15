@@ -15,7 +15,7 @@ class Bf_reverse(object):
     
     
     def fileSize(self):
-        tempFile = open(self.filepath, 'rb')
+        tempFile = open(self.filepath, 'r')
         tempFile.seek(0,2)
         size = tempFile.tell()
         tempFile.seek(0,0)
@@ -28,7 +28,7 @@ class Bf_reverse(object):
             bytes = str(newfile.read(16))
             while bytes:
                 self.butterflyTab.append(bytes)
-                print bytes, " byte"
+                print (bytes, " byte")
                 bytes = str(newfile.read(16))
             #print ("File has been divided into blocks")
             
@@ -36,7 +36,7 @@ class Bf_reverse(object):
         with open(self.filepath, 'r') as newfile:
             for i in range(0, self.fileSize()/16):
                 byte = newfile.read(16)
-                print byte, " byte"
+                print (byte, " byte")
                 self.butterflyTab.append(byte)
             
     def fileifyBlocks(self):
@@ -94,19 +94,19 @@ class Bf_reverse(object):
         self.fileTab[indexTwo] = blockTwo
         #print self.count
         
-bf_rev = Bf_reverse(filepath = 'C:\\Users\\olerasmu\\Documents\\workspace\\Butterfly\\src\\root\\nested\\bf_hourglass.txt')
-print bf_rev.fileSize()
+bf_rev = Bf_reverse(filepath = 'C:\Users\Ole\Documents\Skole\Master\workspace\ButterflyMode\src\root\nested\\bf_hourglass.txt')
+print (bf_rev.fileSize())
 #bf_rev.blockifyFile()
 bf_rev.blockifyFileTwo()
-print "Butterflytab: ", bf_rev.butterflyTab
-print "filetab: ", bf_rev.fileTab
+print ("Butterflytab: ", bf_rev.butterflyTab)
+print ("filetab: ", bf_rev.fileTab)
 n = len(bf_rev.butterflyTab)
-print "This is n", n
+print ("This is n", n)
 d = int(math.log(n, 2))
 
 bf_rev.initiateButterfly(d, n)
-print bf_rev.filepath
-print "This is filetab after: ", bf_rev.fileTab
-print len(bf_rev.fileTab)
+print (bf_rev.filepath)
+print ("This is filetab after: ", bf_rev.fileTab)
+print (len(bf_rev.fileTab))
 bf_rev.fileifyBlocks()
 

@@ -18,7 +18,7 @@ class Bf_reverse(object):
     
     
     def fileSize(self):
-        tempFile = open(self.filepath, 'rb')
+        tempFile = open(self.filepath, 'r')
         tempFile.seek(0,2)
         size = tempFile.tell()
         tempFile.seek(0,0)
@@ -33,6 +33,7 @@ class Bf_reverse(object):
             bytes = str(newfile.read(16))
             while bytes:
                 self.butterflyTab.append(bytes)
+
                 #print bytes, " bytenr: ", count
                 #count += 1 
                 bytes = str(newfile.read(16))
@@ -43,6 +44,7 @@ class Bf_reverse(object):
         with open(self.filepath, 'rb') as newfile:
             for i in range(0, self.fileSize()/16):
                 byte = newfile.read(16)
+
                 print byte, " bytenr: ", i
                 self.butterflyTab.append(byte)
     
@@ -113,12 +115,19 @@ class Bf_reverse(object):
     def w(self, blockOne, blockTwo, indexOne, indexTwo):
         #print blockOne, " ", blockTwo, " this is seperated"
         
+        #print blockOne, blockTwo
         blockOne2 = self.cipher_machine.decrypt(blockOne)
         blockTwo2 = self.cipher_machine.decrypt(blockTwo)
         
-        combostring = blockTwo2 + blockOne2
+        #=======================================================================
+        # #This is for when encapsulation is done through interleaving
+        # combostring = blockTwo2 + blockOne2
+        # new_block_one, new_block_two = combostring[1::2], combostring[0::2]
+        #=======================================================================
         
-        new_block_one, new_block_two = combostring[0::2], combostring[1::2]
+        #This is for when encapsulation is done through split and combine
+        new_block_one = blockOne2[len(blockOne2)/2:] + blockTwo2[len(blockTwo2)/2:]
+        new_block_two = blockOne2[:len(blockOne2)/2] + blockTwo2[:len(blockTwo2)/2]
         
         
         #print len(combostring)
@@ -126,12 +135,13 @@ class Bf_reverse(object):
         #print new_block_one, " ",  new_block_two, " this is after"
         
         
-        self.fileTab[indexOne] = new_block_one
-        self.fileTab[indexTwo] = new_block_two
+        self.fileTab[indexOne] = new_block_two
+        self.fileTab[indexTwo] = new_block_one
         #print self.count
         
+        #print new_block_one, new_block_two
         
-bf_rev = Bf_reverse(filepath = 'C:\\Users\\olerasmu\\Documents\\workspace\\Butterfly\\src\\root\\nested\\bf_hourglass.txt')
+bf_rev = Bf_reverse(filepath = 'C:\\Users\\Ole\\Documents\\Skole\\Master\\workspace\\ButterflyMode\\src\\root\\nested\\bf_hourglass.txt')
 start  = timeit.default_timer()
 #print bf_rev.fileSize()
 #print os.path.getsize(bf_rev.filepath)
@@ -153,3 +163,9 @@ bf_rev.fileifyBlocks2()
 stop = timeit.default_timer()
 
 print "Start: ", start, "\n Stop: ", stop, "\n Time: ", stop - start
+
+writeable = "Size:" + str(bf_rev.fileSize()) + " time:" + str(stop-start)
+writeable = str(writeable) + "\n"
+
+with open('resultfile.txt', 'a') as resultfile:
+            resultfile.write(writeable)
